@@ -2,12 +2,13 @@ package com.example.paging3.recyclerview
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.example.paging3.data.Article
 import com.example.paging3.databinding.ArticleViewholderBinding
 
-class ArticleAdapter: ListAdapter<Article, ArticleViewHolder>(ARTICLE_DIFF_CALLBACK) {
+class ArticleAdapter: /*ListAdapter*/PagingDataAdapter<Article, ArticleViewHolder>(ARTICLE_DIFF_CALLBACK) {
 
     companion object {
         private val ARTICLE_DIFF_CALLBACK = object : DiffUtil.ItemCallback<Article>() {

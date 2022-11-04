@@ -1,5 +1,6 @@
 package com.example.paging3.data
 
+import com.example.paging3.paging.ArticlePagingSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -21,4 +22,8 @@ class ArticleRepository {
                 created = firstArticleCreatedTime.minusDays(it.toLong())
             )
     })
+
+    // 使用 PagingSource
+    fun articlePagingSource() = ArticlePagingSource()
+
 }

@@ -3,20 +3,23 @@ package com.example.paging3
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.paging3.databinding.ActivityMainBinding
 import com.example.paging3.recyclerview.ArticleAdapter
 import com.example.paging3.viewmodel.ArticleViewModel
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 private const val TAG = "MainActivity"
 class MainActivity : AppCompatActivity() {
-    private val binDing by lazy {
+    private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
@@ -27,13 +30,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //setContentView(R.layout.activity_main)
-        setContentView(binDing.root)
+        setContentView(binding.root)
 
         val items = articleViewModel.items
         val articleAdapter = ArticleAdapter()
 
         // 给 recyclerview 绑定 adapter
-        binDing.bindAdapter(articleAdapter = articleAdapter)
+        binding.bindAdapter(articleAdapter = articleAdapter)
 
         // Collect from the Article Flow in the ViewModel, and submit it to the
         // ListAdapter.
@@ -42,12 +45,24 @@ class MainActivity : AppCompatActivity() {
             // but still visible on the screen, for example in a multi window app
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 // 调用 下游终止操作符 collect
-                items.collect {
+/*                items.collect {
                     Log.d(TAG,"collect size = ${it.size}")
                     if (it.isNotEmpty()){
                         Log.d(TAG,"first = ${it[0]}")
                     }
                     articleAdapter.submitList(it)
+                }*/
+                items.collectLatest {
+                    articleAdapter.submitData(it)
+                }
+            }
+        }
+        // 当 Paging 库提取更多项时，底部进度条会显示；当提取完成时，底部进度条会消失
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                articleAdapter.loadStateFlow.collect {
+                    binding.prependProgress.isVisible = it.source.prepend is LoadState.Loading
+                    binding.appendProgress.isVisible = it.source.append is LoadState.Loading
                 }
             }
         }
