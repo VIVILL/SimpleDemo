@@ -13,10 +13,10 @@ import com.example.dogdisplay.viewholder.DogListHolder
 private const val TAG = "DogListAdapter"
 class DogListAdapter : ListAdapter<Dog,DogListHolder>(DogDiffCallback()) {
 
-    private val dogList  = mutableListOf<Dog>()
+/*    private val dogList  = mutableListOf<Dog>()
     fun setList(dogList: List<Dog>) {
         this.dogList.addAll(dogList)
-    }
+    }*/
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DogListHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -26,7 +26,8 @@ class DogListAdapter : ListAdapter<Dog,DogListHolder>(DogDiffCallback()) {
 
     override fun onBindViewHolder(holder: DogListHolder, position: Int) {
         Log.d(TAG, "inner onBindViewHolder")
-        val dog = dogList.get(position)
+       // val dog = dogList.get(position)
+        val dog = getItem(position)
         Log.d(TAG, "dog = $dog")
         holder.bind(dog)
         holder.bindItemClick(onClick)
@@ -38,9 +39,9 @@ class DogListAdapter : ListAdapter<Dog,DogListHolder>(DogDiffCallback()) {
         this.onClick = onClick
     }
 
-    override fun getItemCount(): Int {
+/*    override fun getItemCount(): Int {
         return dogList.size
-    }
+    }*/
 }
 
 class DogDiffCallback : DiffUtil.ItemCallback<Dog>() {

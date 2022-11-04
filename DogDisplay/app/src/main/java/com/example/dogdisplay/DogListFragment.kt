@@ -64,12 +64,12 @@ class DogListFragment : Fragment() {
 
     private fun startObserver() {
         dogViewModel.dogListLiveData.observe(viewLifecycleOwner){
-            Log.d("DogListFragment","setList")
-            adapter.setList(it)
+            // adapter.setList(it)
             //数据改变刷新视图
           //  adapter.notifyDataSetChanged()
             // 使用 submitList() 及时更新列表
             it?.let {
+                Log.d("DogListFragment","submitList")
                 adapter.submitList(it)
             }
         }
