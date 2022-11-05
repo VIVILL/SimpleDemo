@@ -7,6 +7,7 @@ import com.example.paging3.data.Article
 import kotlinx.coroutines.delay
 import java.lang.Math.max
 import java.time.LocalDateTime
+import java.util.*
 
 private const val STARTING_KEY = 0
 private val firstArticleCreatedTime = LocalDateTime.now()
@@ -33,7 +34,8 @@ class ArticlePagingSource : PagingSource<Int, Article>() {
                     id = number,
                     title = "Article $number",
                     description = "This describes article $number",
-                    created = firstArticleCreatedTime.minusDays(number.toLong())
+                    //created = Date()
+                     created = firstArticleCreatedTime.minusDays(number.toLong())
                 )
             },
             // Make sure we don't try to load items behind the STARTING_KEY

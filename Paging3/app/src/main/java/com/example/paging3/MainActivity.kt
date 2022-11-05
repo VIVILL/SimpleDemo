@@ -27,7 +27,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val articleViewModel by lazy {
-        ViewModelProvider(this,Injection.provideViewModelFactory(owner = this)).get(ArticleViewModel::class.java)
+        ViewModelProvider(this,Injection.provideViewModelFactory(
+            owner = this,
+            context = this)
+        ).get(ArticleViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,12 +38,19 @@ class MainActivity : AppCompatActivity() {
         //setContentView(R.layout.activity_main)
         setContentView(binding.root)
 
-        val items = articleViewModel.items
+        // 把数据加载到数据库
+        articleViewModel.addLocalList()
+
+        //val items = articleViewModel.items
+        // 通过 room 获取 PagingData
+        val items = articleViewModel.allArticlePagingData
 
         val articleAdapter = ArticleAdapter()
 
-        articleAdapter.setOnItemClickListener {
-            Log.d(TAG,"position = $it")
+        articleAdapter.setOnItemClickListener {position,article ->
+            Log.d(TAG,"position = $position article = $article")
+            // 点击后 删除
+            articleViewModel.delete(article)
         }
         // 给 recyclerview 绑定 adapter
         binding.bindAdapter(articleAdapter = articleAdapter)

@@ -32,16 +32,16 @@ class ArticleAdapter: /*ListAdapter*/PagingDataAdapter<Article, ArticleViewHolde
 
     override fun onBindViewHolder(holder: ArticleViewHolder, position: Int) {
         // 通过 getItem 获取数据
-        val tile = getItem(position)
-        if (tile != null) {
-            holder.bind(tile)
+        val article = getItem(position)
+        if (article != null) {
+            holder.bind(article)
             holder.bindItemClick(onClick)
         }
     }
 
-    private lateinit var onClick: (position: Int) -> Unit
+    private lateinit var onClick: (position: Int,article:Article) -> Unit
 
-    fun setOnItemClickListener(onClick : (position: Int) -> Unit){
+    fun setOnItemClickListener(onClick : (position: Int,article:Article) -> Unit){
         this.onClick = onClick
     }
 }
