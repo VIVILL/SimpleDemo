@@ -25,5 +25,4 @@ class ArticleRepository {
 
     // 使用 PagingSource
     fun articlePagingSource() = ArticlePagingSource()
-
 }

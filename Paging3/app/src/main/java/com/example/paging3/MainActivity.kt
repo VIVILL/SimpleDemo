@@ -9,8 +9,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
+import androidx.paging.PagingData
+import androidx.paging.filter
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.paging3.data.Article
 import com.example.paging3.databinding.ActivityMainBinding
 import com.example.paging3.recyclerview.ArticleAdapter
 import com.example.paging3.viewmodel.ArticleViewModel
@@ -33,8 +36,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val items = articleViewModel.items
+
         val articleAdapter = ArticleAdapter()
 
+        articleAdapter.setOnItemClickListener {
+            Log.d(TAG,"position = $it")
+        }
         // 给 recyclerview 绑定 adapter
         binding.bindAdapter(articleAdapter = articleAdapter)
 

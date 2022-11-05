@@ -35,6 +35,13 @@ class ArticleAdapter: /*ListAdapter*/PagingDataAdapter<Article, ArticleViewHolde
         val tile = getItem(position)
         if (tile != null) {
             holder.bind(tile)
+            holder.bindItemClick(onClick)
         }
+    }
+
+    private lateinit var onClick: (position: Int) -> Unit
+
+    fun setOnItemClickListener(onClick : (position: Int) -> Unit){
+        this.onClick = onClick
     }
 }
