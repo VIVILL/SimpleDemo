@@ -21,6 +21,10 @@ class ArticlePagingSource : PagingSource<Int, Article>() {
         val start = params.key ?: STARTING_KEY
         // Load as many items as hinted by params.loadSize
         val range = start.until(start + params.loadSize)
+        //初次加载 params.loadSize 大小 是 ITEMS_PER_PAGE 的3倍
+        // start = 0 params.loadSize = 150  range = 0..149 , range first = 0  range last = 149
+        //第二次加载 params.loadSize 大小 是 ITEMS_PER_PAGE
+        // start = 150 params.loadSize = 50  range = 150..199 , range first = 150  range last = 199
         Log.d(TAG,"start = $start params.loadSize = ${params.loadSize}" +
                 "  range = $range , range first = ${range.first} " +
                 " range last = ${range.last}")
