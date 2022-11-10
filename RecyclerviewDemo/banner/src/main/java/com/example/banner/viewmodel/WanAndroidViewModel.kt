@@ -18,16 +18,24 @@ private const val TAG = "WanAndroidViewModel"
 class WanAndroidViewModel @Inject constructor(
     private val repository: WanAndroidRepository
 ) : ViewModel(){
-    private val _bannerListFlow: Flow<List<Banner>> =
-        repository.getBannerFlow()
-            .catch { throwable ->
-                // Catch exceptions in all down stream flow
-                // Any error occurs after this catch operator
-                // will not be caught here
-                println(throwable)
-            }
+    private val _bannerListStateFlow = MutableStateFlow<List<Banner>>(ArrayList())
 
-    val bannerListFlow: Flow<List<Banner>> = _bannerListFlow
+    val bannerListStateFlow: StateFlow<List<Banner>> = _bannerListStateFlow
+
+    fun updateBannerList() {
+        // 更新  value 数据
+        viewModelScope.launch {
+            _bannerListStateFlow.value = repository.getBannerFlow()
+                .catch { throwable ->
+                    // Catch exceptions in all down stream flow
+                    // Any error occurs after this catch operator
+                    // will not be caught here
+                    println(throwable)
+                }
+                .stateIn(viewModelScope)
+                .value
+        }
+    }
 
     // 获取文章
     fun getArticle(): Flow<PagingData<Article>> {
