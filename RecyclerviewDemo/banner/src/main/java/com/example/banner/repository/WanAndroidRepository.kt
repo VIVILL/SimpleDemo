@@ -10,6 +10,7 @@ import com.example.banner.bean.Banner
 import com.example.banner.bean.BannerResponse
 import com.example.banner.paging.HomeArticlePagingSource
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -34,8 +35,12 @@ class WanAndroidRepository @Inject constructor(
         ).flow
     }
 
-    suspend fun getBanner(): BannerResponse<List<Banner>> {
-        return wanAndroidApi.getBanner()
+    fun getBannerFlow(): Flow<List<Banner>> {
+        return flow {
+            wanAndroidApi.getBanner().data?.let {
+                emit(it)
+            }
+        }
     }
 
 }

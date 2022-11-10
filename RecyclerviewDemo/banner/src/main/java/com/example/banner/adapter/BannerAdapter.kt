@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.banner.bean.Banner
 import com.example.banner.databinding.ItemImageBinding
 
-class BannerAdapter(val bannerList: MutableList<Banner>): RecyclerView.Adapter< BannerViewHolder> () {
+class BannerAdapter(var bannerList: List<Banner>): RecyclerView.Adapter< BannerViewHolder> () {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BannerViewHolder {
         return BannerViewHolder(

@@ -18,26 +18,16 @@ private const val TAG = "BannerViewModel"
 class BannerViewModel @Inject constructor(
     private val repository: WanAndroidRepository
 ) : ViewModel(){
-
-    private val _bannerListLiveData =  MutableLiveData<List<Banner>>()
-    val bannerListLiveData: LiveData<List<Banner>> = _bannerListLiveData
-
-    private val bannerList  = mutableListOf<Banner>()
-
-    fun updateBannerList(){
-        Log.d(TAG,"inner updateBannerList")
-        viewModelScope.launch {
-            try {
-                bannerList.clear()
-                bannerList.addAll(repository.getBanner().data!!)
-                _bannerListLiveData.postValue(bannerList)
-                Log.d(TAG,"bannerListSize = ${bannerList.size}")
-            } catch(e: Exception) {
-                e.printStackTrace()
+    private val _bannerListFlow: Flow<List<Banner>> =
+        repository.getBannerFlow()
+            .catch { throwable ->
+                // Catch exceptions in all down stream flow
+                // Any error occurs after this catch operator
+                // will not be caught here
+                println(throwable)
             }
 
-        }
-    }
+    val bannerListFlow: Flow<List<Banner>> = _bannerListFlow
 
     // 获取文章
     fun getArticle(): Flow<PagingData<Article>> {

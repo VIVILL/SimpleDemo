@@ -58,17 +58,23 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         Log.d(TAG,"inner onResume")
-        viewModel.updateBannerList()
     }
 
     private fun startObserver() {
-        viewModel.bannerListLiveData.observe(this){
-            // 更新 list
-            bannerAdapter.bannerList.addAll(it)
-            Log.d(TAG," bannerList size = ${bannerAdapter.bannerList.size}")
-            //数据改变刷新视图
-            bannerAdapter.notifyDataSetChanged()
+        // bannerListFlow
+        lifecycleScope.launch {
+            // We repeat on the STARTED lifecycle because an Activity may be PAUSED
+            // but still visible on the screen, for example in a multi window app
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.bannerListFlow.collect{ value ->
+                    // 更新 list
+                    bannerAdapter.bannerList = value
+                    Log.d(TAG," bannerList size = ${bannerAdapter.bannerList.size}")
+                    //数据改变刷新视图
+                    bannerAdapter.notifyDataSetChanged()
 
+                }
+            }
         }
 
         // 设置 banner 无限循环滑动
