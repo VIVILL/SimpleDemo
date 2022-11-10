@@ -53,6 +53,8 @@ class MainActivity : AppCompatActivity() {
         )
         // 为RecyclerView配置adapter
         binding.recyclerview.adapter = concatAdapter
+
+        viewModel.updateBannerList()
     }
 
     override fun onResume() {
@@ -66,7 +68,7 @@ class MainActivity : AppCompatActivity() {
             // We repeat on the STARTED lifecycle because an Activity may be PAUSED
             // but still visible on the screen, for example in a multi window app
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.bannerListFlow.collect{ value ->
+                viewModel.bannerListStateFlow.collect{ value ->
                     // 更新 list
                     bannerAdapter.bannerList = value
                     Log.d(TAG," bannerList size = ${bannerAdapter.bannerList.size}")
