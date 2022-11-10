@@ -12,10 +12,10 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-private const val TAG = "BannerViewModel"
+private const val TAG = "WanAndroidViewModel"
 
 @HiltViewModel
-class BannerViewModel @Inject constructor(
+class WanAndroidViewModel @Inject constructor(
     private val repository: WanAndroidRepository
 ) : ViewModel(){
     private val _bannerListFlow: Flow<List<Banner>> =

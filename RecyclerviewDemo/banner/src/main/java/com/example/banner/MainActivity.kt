@@ -15,7 +15,7 @@ import com.example.banner.adapter.ArticleAdapter
 import com.example.banner.adapter.BannerAdapter
 import com.example.banner.bean.Banner
 import com.example.banner.databinding.ActivityMainBinding
-import com.example.banner.viewmodel.BannerViewModel
+import com.example.banner.viewmodel.WanAndroidViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
-    private val viewModel: BannerViewModel by viewModels()
+    private val viewModel: WanAndroidViewModel by viewModels()
 
     private val bannerAdapter = BannerAdapter(ArrayList<Banner>())
     private val headerAdapter = HeaderAdapter(bannerAdapter)
