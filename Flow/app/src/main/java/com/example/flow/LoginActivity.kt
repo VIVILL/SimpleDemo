@@ -4,10 +4,13 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.flow.databinding.ActivityLoginBinding
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
     private val binding by lazy {
@@ -21,7 +24,9 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         binding.btnLogin.setOnClickListener{
-            viewModel.login( binding.etUserName.text.toString(),
+/*            viewModel.login( binding.etUserName.text.toString(),
+                binding.etPassword.text.toString())*/
+            viewModel.loginBySharedFlow( binding.etUserName.text.toString(),
                 binding.etPassword.text.toString())
         }
 
@@ -49,6 +54,34 @@ class LoginActivity : AppCompatActivity() {
                     }
                     else -> Unit
                 }
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            viewModel.loginUiAction.collect {
+                when (it) {
+                    is LoginUiAction.Success -> {
+                        Snackbar.make(
+                            binding.root,
+                            "Successfully logged in",
+                            Snackbar.LENGTH_LONG
+                        ).show()
+                        binding.progressBar.isVisible = false
+                    }
+                    is LoginUiAction.Error -> {
+                        Snackbar.make(
+                            binding.root,
+                            it.message,
+                            Snackbar.LENGTH_LONG
+                        ).show()
+                        binding.progressBar.isVisible = false
+                    }
+                    is LoginUiAction.Loading -> {
+                        binding.progressBar.isVisible = true
+                    }
+                    else -> Unit
+                }
+
             }
         }
 
