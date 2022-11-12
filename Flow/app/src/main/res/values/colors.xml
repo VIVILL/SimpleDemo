@@ -7,4 +7,24 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="orange_main">#ec6f1a</color>
+    <color name="orange_light">#ffd39b</color>
+    <color name="orange_deep">#ff6f3a</color>
+    <color name="orange_most">#C76114</color>
+    <color name="orange_litter">#80aa6136</color>
+
+    <color name="line">#e0e0e0</color>
+    <color name="tv_gray_litter">#FAF0E6</color>
+    <color name="tv_gray_normal">#c0c0c0</color>
+    <color name="tv_gray_deep">#818181</color>
+    <color name="tv_gray_lit">#50b1b1b1</color>
+    <color name="tv_gray">@android:color/darker_gray</color>
+    <color name="tv_color">#ffffff</color>
+    <color name="list_glide">#50e0e0e0</color>
+
+    <color name="transparent_half">#a0000000</color>
+    <color name="transparent_half_orange">#a0ec6f1a</color>
+    <color name="top_bar_normal_bg">#ec6f1a</color>
+
 </resources>

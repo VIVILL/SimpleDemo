@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.*
 import com.example.flow.databinding.ActivityMainBinding
+import com.example.flow.viewmodel.FlowTestViewModel
 import kotlinx.coroutines.flow.SharingStarted.Companion.Lazily
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.shareIn
