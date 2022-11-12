@@ -14,14 +14,8 @@ class FlowTestViewModel: ViewModel() {
     private val repository: Repository = Repository()
 
     // 使用 flow
-    private var _numberFlow = repository.getRandomNumber()
+    private val _numberFlow = repository.getRandomNumber()
     val numberFlow: Flow<Int> = _numberFlow
-
-    fun updateNumberFlow() {
-        // 更新 _countStateFlow
-        Log.d(TAG,"inner updateNumberFlow")
-        _numberFlow = repository.getRandomNumber()
-    }
 
     // 使用 StateFlow
     // StateFlow 具有一个属性 value，可以被设置
@@ -30,11 +24,23 @@ class FlowTestViewModel: ViewModel() {
     val numberStateFlow: StateFlow<Int> = _numberStateFlow
 
     fun updateNumberStateFlow() {
-        // 更新 _countStateFlow 的 value 数据
+        // 更新  value 数据
         viewModelScope.launch {
             _numberStateFlow.value = repository.getRandomNumber()
                 .stateIn(viewModelScope)
                 .value
+        }
+    }
+
+    // 使用 SharedFlow
+    private val _numberSharedFlow = MutableSharedFlow<Int>()
+    val numberSharedFlow: SharedFlow<Int> = _numberSharedFlow
+
+    fun updateNumberSharedFlow() {
+        viewModelScope.launch {
+            repository.getRandomNumber().collect {
+                _numberSharedFlow.emit(it)
+            }
         }
     }
 
