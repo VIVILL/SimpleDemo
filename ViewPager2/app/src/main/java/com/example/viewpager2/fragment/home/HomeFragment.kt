@@ -15,6 +15,8 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
+    private var mLayoutMediator: TabLayoutMediator? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG,"inner onCreate")
@@ -46,8 +48,8 @@ class HomeFragment : Fragment() {
         // 设置 offscreenPageLimit
         // 解决 使用 navigation 时 切换回 viewPager 界面时内存泄漏问题
         binding.viewPager2.offscreenPageLimit = 1
-        //绑定tabLayout和viewPager
-        TabLayoutMediator(
+        //绑定 tabLayout 和 viewPager
+        mLayoutMediator =  TabLayoutMediator(
             binding.tabLayout,
             binding.viewPager2
         ) { tab, position ->
@@ -56,9 +58,16 @@ class HomeFragment : Fragment() {
                 1 -> tab.text = "Second"
                 else -> tab.text = "Third"
             }
-        }.attach()
+        }
+        mLayoutMediator?.attach()
 
         return binding.root
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG,"inner onDestroy")
+        // TabLayout 解绑
+        mLayoutMediator?.detach()
+    }
 }
