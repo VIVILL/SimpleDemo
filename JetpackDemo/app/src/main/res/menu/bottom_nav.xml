@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/homeFragment"
+        android:icon="@drawable/nav_home"
+        android:title="@string/tab_home" />
+    <item
+        android:id="@+id/projectFragment"
+        android:icon="@drawable/nav_project"
+        android:title="@string/tab_project" />
+    <item
+        android:id="@+id/userFragment"
+        android:icon="@drawable/nav_user"
+        android:title="@string/tab_user" />
+
+</menu>
