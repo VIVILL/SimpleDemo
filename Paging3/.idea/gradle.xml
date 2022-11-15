@@ -12,6 +12,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/networkpaging" />
+            <option value="$PROJECT_DIR$/remotemediator" />
           </set>
         </option>
       </GradleProjectSettings>
