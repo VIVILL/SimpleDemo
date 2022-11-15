@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -70,9 +71,11 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 repoAdapter.loadStateFlow.collectLatest { loadState ->
-                    Log.d(TAG, "initListener: $loadState")
+                    Log.d(TAG, "loadState  =  $loadState")
                     // 下拉刷新
                     binding.swipeLayout.isRefreshing = loadState.refresh is LoadState.Loading
+                    // 上拉加载
+                    binding.progressIndicator.isVisible = loadState.source.append is LoadState.Loading
 
                 }
             }
