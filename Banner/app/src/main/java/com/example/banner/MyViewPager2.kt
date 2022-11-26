@@ -36,13 +36,24 @@ class MyViewPager2 @JvmOverloads constructor(
         Log.d(TAG,"inner setAdapter")
         this.adapter = adapter
         adapterSize = adapter.itemCount
-        getVewPager2().adapter = adapter
+        getViewPager2().adapter = adapter
         // 设置离屏加载 防止滑动时白屏
-        getVewPager2().offscreenPageLimit = adapter.itemCount
+        getViewPager2().offscreenPageLimit = adapter.itemCount
     }
 
     fun setPosition(position: Int){
-        getVewPager2().currentItem = position
+        Log.d(TAG,"inner setPosition position = $position")
+        when (position) {
+            in 1..adapterSize-2 -> {
+                getViewPager2().setCurrentItem(position,false)
+            }
+            0 -> {
+                getViewPager2().setCurrentItem(adapterSize-2,false)
+            }
+            adapterSize-1 -> {
+                getViewPager2().setCurrentItem(1,false)
+            }
+        }
     }
 
     init {
@@ -83,8 +94,12 @@ class MyViewPager2 @JvmOverloads constructor(
         return lifecycleRegistry
     }
 
-    private fun getVewPager2(): ViewPager2 {
+    private fun getViewPager2(): ViewPager2 {
         return binding.viewPager2
+    }
+
+    fun getViewPager2CurrentItem(): Int {
+        return binding.viewPager2.currentItem
     }
 
     /**
@@ -111,7 +126,7 @@ class MyViewPager2 @JvmOverloads constructor(
                         // 等待5s后 重新开始 无限循环
                         delay(5000L)
                         // 保存当前位置
-                        currentPosition = getVewPager2().currentItem
+                        currentPosition = getViewPager2().currentItem
                         autoScroll = true
                         Log.d(TAG,"after delay 5000L currentPosition = $currentPosition , after set autoScroll = true")
 
@@ -138,7 +153,7 @@ class MyViewPager2 @JvmOverloads constructor(
                         // setCurrentItem 后 onPageSelected 会被调用
                         //    binding.viewPager.setCurrentItem(position, false)
                         // 通过设置动画，实现 自动滑动时 平滑滚动
-                        MyPagerHelper.setCurrentItem(getVewPager2(), position, 300)
+                        MyPagerHelper.setCurrentItem(getViewPager2(), position, 300)
                         Log.d(TAG,"after setCurrentItem position = $position , currentPosition = $currentPosition duration 300")
                     }
                 }
@@ -184,38 +199,6 @@ class MyViewPager2 @JvmOverloads constructor(
                     binding.linearLayout.setSelected(0)
                 }
             }
-/*                if (position in 1..3){
-                    binding.linearLayout.setSelected(position-1)
-                }else if (position == 0){
-                    binding.linearLayout.setSelected(2)
-                }else if (position == 4){
-                    binding.linearLayout.setSelected(0)
-                }*/
-
-            /* when (position){
-                 0 -> {
-                     // 第三个圆 置 true 其余圆置 false
-                     binding.linearLayout.setSelected(2)
-                 }
-                 1 -> {
-                     // 第一个圆 置 true 其余圆置 false
-                     binding.linearLayout.setSelected(0)
-                 }
-                 2 -> {
-                     // 第二个圆 置 true 其余圆置 false
-                     binding.linearLayout.setSelected(1)
-                 }
-                 3 -> {
-                     // 第三个圆 置 true 其余圆置 false
-                     binding.linearLayout.setSelected(2)
-                 }
-                 4 -> {
-                     // 第一个圆 置 true 其余圆置 false
-                     binding.linearLayout.setSelected(0)
-                 }
-                 else -> {}
-             }*/
-
         }
 
         override fun onPageScrollStateChanged(state: Int) {
@@ -227,12 +210,12 @@ class MyViewPager2 @JvmOverloads constructor(
     fun register(){
         lifecycleRegistry = LifecycleRegistry(this)
         Log.d(TAG,"after lifecycleRegistry")
-        getVewPager2().registerOnPageChangeCallback(onPageChangeCallback)
+        getViewPager2().registerOnPageChangeCallback(onPageChangeCallback)
     }
 
     fun unRegister(){
         Log.d(TAG,"inner unRegister")
-        getVewPager2().unregisterOnPageChangeCallback(onPageChangeCallback)
+        getViewPager2().unregisterOnPageChangeCallback(onPageChangeCallback)
     }
 
     private fun onChanged(state: Int) {
@@ -248,13 +231,13 @@ class MyViewPager2 @JvmOverloads constructor(
                     //   binding.viewPager.setCurrentItem(adapter.itemCount - 2, false)
                     // 设置动画，并把滚动时间时间设置为0
                     // 防止 setCurrentItem 跨多页闪现问题
-                    MyPagerHelper.setCurrentItem(getVewPager2(), adapter.itemCount - 2, 0)
+                    MyPagerHelper.setCurrentItem(getViewPager2(), adapter.itemCount - 2, 0)
                     Log.d(TAG,"after setCurrentItem  ${adapter.itemCount - 2} duration 0 currentPosition = 0")
                 } else if (currentPosition == adapter.itemCount - 1) {
                     //当前显示最后一张图片的时候，右滑后显示第一张
                     // currentPosition = 4 setCurrentItem  1
                     //   binding.viewPager.setCurrentItem(1, false)
-                    MyPagerHelper.setCurrentItem(getVewPager2(), 1, 0)
+                    MyPagerHelper.setCurrentItem(getViewPager2(), 1, 0)
                     Log.d(TAG,"after setCurrentItem 1 duration 0")
                 }
             }
