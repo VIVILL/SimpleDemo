@@ -12,6 +12,7 @@ import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 import com.example.banner.adapter.HeaderItemAdapter
 import com.example.banner.databinding.LayoutMyViewpager2Binding
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -120,7 +121,7 @@ class MyViewPager2 @JvmOverloads constructor(
                     Log.d(TAG,"after job.cancel()")
                 }
                 Log.d(TAG,"after set autoScroll = false")
-                job = lifecycleScope.launch {
+                job = lifecycleScope.launch(exceptionHandler) {
                     repeatOnLifecycle(Lifecycle.State.STARTED) {
                         Log.d(TAG,"after launch")
                         // 等待5s后 重新开始 无限循环
@@ -141,7 +142,7 @@ class MyViewPager2 @JvmOverloads constructor(
     fun autoScroll(){
         Log.d(TAG,"inner autoScroll")
 
-        lifecycleScope.launch {
+        lifecycleScope.launch(exceptionHandler) {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 repeat(Int.MAX_VALUE){
                     Log.d(TAG,"inner repeat")
@@ -160,6 +161,10 @@ class MyViewPager2 @JvmOverloads constructor(
 
             }
         }
+    }
+
+    private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
+        Log.d(TAG, "CoroutineExceptionHandler exception : ${exception.message}")
     }
 
     // 创建圆点指示器
