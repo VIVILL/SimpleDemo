@@ -59,6 +59,9 @@ class MainActivity : AppCompatActivity() {
 
         binding.recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         binding.recyclerView.adapter = concatAdapter
+
+        // 设置需要缓存的 ViewHolder数量 防止离屏后再显示时 频繁执行 onBindViewHolder
+        binding.recyclerView.setItemViewCacheSize(10)
     }
 
 }

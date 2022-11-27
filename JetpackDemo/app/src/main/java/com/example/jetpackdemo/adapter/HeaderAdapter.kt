@@ -1,5 +1,6 @@
 package com.example.jetpackdemo.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,6 +32,7 @@ class HeaderAdapter(private var adapter: BannerAdapter) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        Log.d("HeaderAdapter","inner onBindViewHolder")
         holder.bind(adapter)
     }
 
