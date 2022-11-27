@@ -99,9 +99,8 @@ class MyViewPager2 @JvmOverloads constructor(
         return binding.viewPager2
     }
 
-    fun getViewPager2CurrentItem(): Int {
-        return binding.viewPager2.currentItem
-    }
+    var bannerPosition: Int = 1
+
 
     /**
      * 手指触摸时停止自动轮播,抬起手指后，5s后开启
@@ -186,6 +185,8 @@ class MyViewPager2 @JvmOverloads constructor(
         }
 
         override fun onPageSelected(position: Int) {
+            bannerPosition = position
+
             Log.d(TAG, "inner onPageSelected: position = $position currentPosition = $currentPosition")
             currentPosition = position
             //position数据为   0 1 2 3 4

@@ -18,8 +18,6 @@ class MainActivity : AppCompatActivity() {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
-    private var position: Int = 1
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -40,14 +38,6 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG,"onclick it = $it")
         }
         val headerAdapter = HeaderAdapter(headerItemAdapter)
-        headerAdapter.setPositionListener { position ->
-            Log.d(TAG,"setPositionListener position = $position")
-            this.position = position
-        }
-        headerAdapter.setOnBindListener{
-            Log.d(TAG,"setOnBindListener bannerPosition = $position")
-            return@setOnBindListener position
-        }
 
         val bodyStringList = listOf("aaa","bbb","ccc","aaa","bbb","ccc"
             ,"aaa","bbb","ccc","aaa","bbb","ccc","aaa","bbb","ccc"
