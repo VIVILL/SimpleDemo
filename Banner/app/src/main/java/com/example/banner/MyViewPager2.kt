@@ -62,7 +62,7 @@ class MyViewPager2 @JvmOverloads constructor(
         binding = LayoutMyViewpager2Binding.inflate(LayoutInflater.from(context),this,true)
 
         addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
-            // View onDetached 的时候回调 onDestroy()
+            // View onDetached 的时候调用 onDestroy()
             override fun onViewDetachedFromWindow(v: View?) {
                 Log.d(TAG,"inner onViewDetachedFromWindow")
                 // 在Lifecycle被销毁之后，协程会跟着取消
@@ -70,7 +70,7 @@ class MyViewPager2 @JvmOverloads constructor(
                 unRegister()
             }
 
-            // View onAttached 的时候回调 onCreate()
+            // View onAttached 的时候调用 onStart()
             override fun onViewAttachedToWindow(v: View?) {
                 Log.d(TAG,"inner onViewAttachedToWindow")
                 onStart()
@@ -169,10 +169,6 @@ class MyViewPager2 @JvmOverloads constructor(
     // 创建圆点指示器
     fun createCircle(size: Int){
         binding.linearLayout.createCircle(/*adapter.itemCount - 3*/size)
-        if(currentPosition == 1){// 1 显示的是第一张图片
-            // 第一个圆 置 true 其余圆置 false
-            binding.linearLayout.setSelected(0)
-        }
     }
 
     private val onPageChangeCallback = object: ViewPager2.OnPageChangeCallback() {
