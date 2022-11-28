@@ -23,15 +23,20 @@ class MyViewPager2 @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : FrameLayout(context, attrs, defStyle) , LifecycleOwner {
+) : FrameLayout(context, attrs, defStyle){
     private var binding: LayoutMyViewpager2Binding
     private lateinit var adapter: HeaderItemAdapter
-    var currentPosition: Int = 0
-    private var autoScroll : Boolean = true
-    lateinit var job: Job
-    private lateinit var lifecycleRegistry: LifecycleRegistry
 
     var adapterSize: Int = 0
+
+    // 作用: 1.离屏后恢复位置 2.左右无限滑
+    // 定义初次加载时的位置为 1 , 每次更新位置后保存下数据
+    var bannerPosition: Int = 1
+
+    private lateinit var onTouchEventListener: (ev: MotionEvent)  -> Unit
+    fun setTouchEventListener(onTouchEventListener : (ev: MotionEvent)  -> Unit){
+        this.onTouchEventListener = onTouchEventListener
+    }
 
     fun setAdapter(adapter: HeaderItemAdapter){
         Log.d(TAG,"inner setAdapter")
@@ -46,13 +51,17 @@ class MyViewPager2 @JvmOverloads constructor(
         Log.d(TAG,"inner setPosition position = $position")
         when (position) {
             in 1..adapterSize-2 -> {
+                Log.d(TAG,"in 1..adapterSize-2 setCurrentItem")
                 getViewPager2().setCurrentItem(position,false)
+                binding.linearLayout.setSelected(position-1)
             }
             0 -> {
                 getViewPager2().setCurrentItem(adapterSize-2,false)
+                binding.linearLayout.setSelected(adapterSize-3)
             }
             adapterSize-1 -> {
                 getViewPager2().setCurrentItem(1,false)
+                binding.linearLayout.setSelected(0)
             }
         }
     }
@@ -62,44 +71,22 @@ class MyViewPager2 @JvmOverloads constructor(
         binding = LayoutMyViewpager2Binding.inflate(LayoutInflater.from(context),this,true)
 
         addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
-            // View onDetached 的时候调用 onDestroy()
             override fun onViewDetachedFromWindow(v: View?) {
                 Log.d(TAG,"inner onViewDetachedFromWindow")
-                // 在Lifecycle被销毁之后，协程会跟着取消
-                onDestroy()
                 unRegister()
             }
 
-            // View onAttached 的时候调用 onStart()
             override fun onViewAttachedToWindow(v: View?) {
                 Log.d(TAG,"inner onViewAttachedToWindow")
-                onStart()
+                register()
             }
         })
     }
 
-    fun onStart() {
-        lifecycleRegistry.currentState = Lifecycle.State.STARTED
-        Log.d(TAG,"inner onStart currentState = ${lifecycleRegistry.currentState}")
 
-        // 防止 手指滑动 后置 false 时 离屏导致没有执行置 true
-        autoScroll = true
-    }
-
-
-    fun onDestroy() {
-        lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
-    }
-
-    override fun getLifecycle(): Lifecycle {
-        return lifecycleRegistry
-    }
-
-    private fun getViewPager2(): ViewPager2 {
+    fun getViewPager2(): ViewPager2 {
         return binding.viewPager2
     }
-
-    var bannerPosition: Int = 1
 
 
     /**
@@ -107,63 +94,9 @@ class MyViewPager2 @JvmOverloads constructor(
      */
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
         Log.d(TAG,"inner dispatchTouchEvent ev = $ev")
-        when (ev.action) {
-            MotionEvent.ACTION_DOWN ->  {
-                Log.d(TAG,"inner MotionEvent.ACTION_DOWN")
-                autoScroll = false
-            }
-            MotionEvent.ACTION_UP ->  {
-                Log.d(TAG,"inner MotionEvent.ACTION_UP")
-                // 先取消之前的任务
-                if (this::job.isInitialized){
-                    job.cancel()
-                    Log.d(TAG,"after job.cancel()")
-                }
-                Log.d(TAG,"after set autoScroll = false")
-                job = lifecycleScope.launch(exceptionHandler) {
-                    repeatOnLifecycle(Lifecycle.State.STARTED) {
-                        Log.d(TAG,"after launch")
-                        // 等待5s后 重新开始 无限循环
-                        delay(5000L)
-                        // 保存当前位置
-                        currentPosition = getViewPager2().currentItem
-                        autoScroll = true
-                        Log.d(TAG,"after delay 5000L currentPosition = $currentPosition , after set autoScroll = true")
-
-                    }
-                }
-            }
-        }
+        // 将 MotionEvent 回传
+        onTouchEventListener(ev)
         return super.dispatchTouchEvent(ev)
-    }
-
-    // 开启自动滚动
-    fun autoScroll(){
-        Log.d(TAG,"inner autoScroll")
-
-        lifecycleScope.launch(exceptionHandler) {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                repeat(Int.MAX_VALUE){
-                    Log.d(TAG,"inner repeat")
-                    delay(3000L)
-                    Log.d(TAG,"after delay 3000L autoScroll = $autoScroll currentPosition = $currentPosition")
-                    if (autoScroll){
-                        Log.d(TAG,"currentPosition = $currentPosition")
-                        val position = ++currentPosition
-                        // setCurrentItem 后 onPageSelected 会被调用
-                        //    binding.viewPager.setCurrentItem(position, false)
-                        // 通过设置动画，实现 自动滑动时 平滑滚动
-                        MyPagerHelper.setCurrentItem(getViewPager2(), position, 300)
-                        Log.d(TAG,"after setCurrentItem position = $position , currentPosition = $currentPosition duration 300")
-                    }
-                }
-
-            }
-        }
-    }
-
-    private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
-        Log.d(TAG, "CoroutineExceptionHandler exception : ${exception.message}")
     }
 
     // 创建圆点指示器
@@ -182,9 +115,7 @@ class MyViewPager2 @JvmOverloads constructor(
 
         override fun onPageSelected(position: Int) {
             bannerPosition = position
-
-            Log.d(TAG, "inner onPageSelected: position = $position currentPosition = $currentPosition")
-            currentPosition = position
+            Log.d(TAG, "inner onPageSelected: position = $position")
             //position数据为   0 1 2 3 4
             // 对应的图片为图片  3 1 2 3 1
 
@@ -210,7 +141,6 @@ class MyViewPager2 @JvmOverloads constructor(
     }
     // 注册
     fun register(){
-        lifecycleRegistry = LifecycleRegistry(this)
         Log.d(TAG,"after lifecycleRegistry")
         getViewPager2().registerOnPageChangeCallback(onPageChangeCallback)
     }
@@ -224,10 +154,10 @@ class MyViewPager2 @JvmOverloads constructor(
         when (state) {
             //滑动结束
             ViewPager.SCROLL_STATE_IDLE -> {
-                Log.d(TAG,"inner SCROLL_STATE_IDLE currentPosition = $currentPosition")
+                Log.d(TAG,"inner SCROLL_STATE_IDLE bannerPosition = $bannerPosition")
                 // 滑动时 通过这里实现左右滑无限循环
                 // 自动滑动时需设置动画，否则不走这里
-                if (currentPosition == 0) {
+                if (bannerPosition == 0) {
                     // 当前显示第一张图片的时候，左滑后显示最后一张
                     // currentPosition = 0 setCurrentItem  3
                     //   binding.viewPager.setCurrentItem(adapter.itemCount - 2, false)
@@ -235,7 +165,7 @@ class MyViewPager2 @JvmOverloads constructor(
                     // 防止 setCurrentItem 跨多页闪现问题
                     MyPagerHelper.setCurrentItem(getViewPager2(), adapter.itemCount - 2, 0)
                     Log.d(TAG,"after setCurrentItem  ${adapter.itemCount - 2} duration 0 currentPosition = 0")
-                } else if (currentPosition == adapter.itemCount - 1) {
+                } else if (bannerPosition == adapter.itemCount - 1) {
                     //当前显示最后一张图片的时候，右滑后显示第一张
                     // currentPosition = 4 setCurrentItem  1
                     //   binding.viewPager.setCurrentItem(1, false)

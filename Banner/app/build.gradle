@@ -53,5 +53,8 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.14.2'
     //lifecycleScope
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
-
+    // viewModel
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
+    // 使用 viewModels()
+    implementation 'androidx.fragment:fragment-ktx:1.5.4'
 }
