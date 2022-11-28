@@ -26,12 +26,12 @@ class BannerViewModel: ViewModel() {
 
 
     fun autoScroll() {
-        isAutoScroll = true
         Log.d(TAG,"inner autoScroll isAutoScroll = $isAutoScroll")
         if (this::autoScrollJob.isInitialized) {
             autoScrollJob.cancel()
             Log.d(TAG, "after autoScrollJob.cancel()")
         }
+        isAutoScroll = true
         autoScrollJob = viewModelScope.launch {
             repeat(Int.MAX_VALUE){
                 Log.d(TAG,"inner repeat")
@@ -46,9 +46,9 @@ class BannerViewModel: ViewModel() {
 
     fun cancelAutoScroll() {
         Log.d(TAG,"inner cancelAutoScroll")
+        isAutoScroll = false
         if (this::autoScrollJob.isInitialized) {
             autoScrollJob.cancel()
-            isAutoScroll = false
             Log.d(TAG, "after autoScrollJob.cancel()")
         }
     }
