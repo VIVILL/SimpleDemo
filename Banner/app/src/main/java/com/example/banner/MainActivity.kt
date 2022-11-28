@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
         binding.recyclerView.setItemViewCacheSize(10)
 
         lifecycleScope.launch(exceptionHandler) {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.autoScrollAction.collect {
                     when (it) {
                         is AutoScrollAction.AutoScroll -> {
@@ -97,45 +97,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        lifecycleScope.launch(exceptionHandler) {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.touchAction.collect {
-                    when (it) {
-                        is TouchAction.Touch -> {
-                            Log.d(TAG, "inner Touch")
-                            when (it.event.action) {
-                                MotionEvent.ACTION_DOWN -> {
-                                    Log.d(TAG, "inner MotionEvent.ACTION_DOWN")
-                                    viewModel.isAutoScroll = false
-                                }
-                                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL-> {
-                                    Log.d(TAG, "inner MotionEvent.ACTION_UP or ACTION_CANCEL")
-                                    // 先取消之前的任务
-                                    if (::job.isInitialized) {
-                                        job.cancel()
-                                        Log.d(TAG, "after job.cancel()")
-                                    }
-                                    Log.d(TAG, "after set autoScroll = false")
-                                    job = lifecycleScope.launch {
-                                        repeatOnLifecycle(Lifecycle.State.STARTED) {
-                                            Log.d(TAG, "after launch")
-                                            // 等待5s后 重新开始 无限循环
-                                            delay(5000L)
-                                            viewModel.isAutoScroll = true
-                                            Log.d(TAG, "after delay 5000L, after set autoScroll = true")
-
-                                        }
-                                    }
-                                }
-
-                                else -> {}
-                            }
-                        }
-
-                    }
-                }
-            }
-        }
     }
 
     private val exceptionHandler = CoroutineExceptionHandler { _, exception ->

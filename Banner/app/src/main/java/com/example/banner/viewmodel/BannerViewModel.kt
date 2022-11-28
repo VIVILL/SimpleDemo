@@ -20,7 +20,7 @@ class BannerViewModel: ViewModel() {
     private val _autoScrollAction = MutableSharedFlow<AutoScrollAction>()
     val autoScrollAction: SharedFlow<AutoScrollAction> = _autoScrollAction
 
-    var isAutoScroll: Boolean = true
+    private var isAutoScroll: Boolean = true
 
     lateinit var autoScrollJob: Job
 
@@ -53,14 +53,34 @@ class BannerViewModel: ViewModel() {
         }
     }
 
-    private val _touchAction = MutableSharedFlow<TouchAction>()
-    val touchAction: SharedFlow<TouchAction> = _touchAction
+    private lateinit var pauseAutoScrollJob: Job
 
     fun touch(event: MotionEvent) {
-        viewModelScope.launch {
-            _touchAction.emit(TouchAction.Touch(event))
+        when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                Log.d(TAG, "inner MotionEvent.ACTION_DOWN")
+                isAutoScroll = false
+            }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL-> {
+                Log.d(TAG, "inner MotionEvent.ACTION_UP or ACTION_CANCEL")
+                // 先取消之前的任务
+                if (::pauseAutoScrollJob.isInitialized) {
+                    pauseAutoScrollJob.cancel()
+                    Log.d(TAG, "after job.cancel()")
+                }
+                Log.d(TAG, "after set autoScroll = false")
+                pauseAutoScrollJob = viewModelScope.launch{
+                    Log.d(TAG, "after launch")
+                    // 等待5s后 重新开始 无限循环
+                    delay(5000L)
+                    isAutoScroll = true
+                    Log.d(TAG, "after delay 5000L, after set autoScroll = true")
+                }
+            }
+            else -> {}
         }
     }
+
 
 }
 
