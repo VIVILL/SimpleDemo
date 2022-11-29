@@ -6,12 +6,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewConfiguration
 import android.widget.FrameLayout
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 import com.example.slideconflict.adapter.HeaderItemAdapter
 import com.example.slideconflict.databinding.LayoutMyViewpager2Binding
 import com.example.slideconflict.util.MyPagerHelper
+import kotlin.math.absoluteValue
 
 private const val TAG = "MyViewPager2"
 
@@ -83,6 +85,62 @@ class CustomViewPager2 @JvmOverloads constructor(
     fun getViewPager2(): ViewPager2 {
         return binding.viewPager2
     }
+
+
+    /**
+     * viewpager is not working when using in viewpager
+     * https://stackoverflow.com/questions/68768067/viewpager-is-not-working-when-using-in-viewpager
+     * https://github.com/android/views-widgets-samples/tree/main/ViewPager2 中的NestedScrollableHost实现
+     *
+     * https://juejin.cn/post/6993669025863565342#comment
+     * 解决 viewpager2 在嵌套recyclerview，再嵌套 viewpager2时 不能滑动 里层 viewpager2 的问题
+     */
+
+    private var touchSlop = 0
+    private var initialX = 0f
+    private var initialY = 0f
+
+    init {
+        touchSlop = ViewConfiguration.get(context).scaledTouchSlop
+    }
+
+    override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
+        handleInterceptTouchEvent(ev)
+        return super.onInterceptTouchEvent(ev)
+    }
+
+    private fun handleInterceptTouchEvent(e: MotionEvent) {
+        Log.d(TAG,"inner handleInterceptTouchEvent e = $e")
+        if (e.action == MotionEvent.ACTION_DOWN) {
+            initialX = e.x
+            initialY = e.y
+            parent.requestDisallowInterceptTouchEvent(true)
+            Log.d(TAG,"ACTION_DOWN after requestDisallowInterceptTouchEvent true")
+        } else if (e.action == MotionEvent.ACTION_MOVE) {
+            val dx = e.x - initialX
+            val dy = e.y - initialY
+
+            val scaledDx = dx.absoluteValue * 1f
+            val scaledDy = dy.absoluteValue * .5f
+
+            if (scaledDx > touchSlop || scaledDy > touchSlop) {
+                if (scaledDy > scaledDx) {
+                    //事件拦截，让父类中的RecyclerView消费事件，执行上下滚动界面
+                    Log.d(TAG,"ACTION_MOVE after requestDisallowInterceptTouchEvent false")
+                    parent.requestDisallowInterceptTouchEvent(false)
+                } else {
+                    //事件传递，比如banner中让viewpager2消费事件，执行banner翻页
+                    Log.d(TAG,"ACTION_MOVE after requestDisallowInterceptTouchEvent true")
+                    parent.requestDisallowInterceptTouchEvent(true)
+                }
+            }
+        }else if(e.action == MotionEvent.ACTION_UP){
+            //事件拦截
+            Log.d(TAG,"ACTION_UP after requestDisallowInterceptTouchEvent false")
+            parent.requestDisallowInterceptTouchEvent(false)
+        }
+    }
+
 
 
     /**
