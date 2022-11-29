@@ -4,23 +4,36 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.slideconflict.adapter.ViewPagerAdapter
 import com.example.slideconflict.databinding.FragmentHomeBinding
+import com.example.slideconflict.viewmodel.TouchAction
+import com.example.slideconflict.viewmodel.TouchViewModel
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 private const val TAG = "HomeFragment"
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
+    private val viewModel: TouchViewModel by activityViewModels()
+    private var startX = 0
+    private var startY = 0
+
     private var mLayoutMediator: TabLayoutMediator? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG,"inner onCreate")
-
     }
 
     override fun onCreateView(
@@ -70,4 +83,56 @@ class HomeFragment : Fragment() {
         // TabLayout 解绑
         mLayoutMediator?.detach()
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        subscribeUI()
+    }
+
+    private fun subscribeUI() {
+        viewLifecycleOwner.lifecycleScope.launch(exceptionHandler){
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.recyclerviewTouchAction.collect {
+                    when (it) {
+                        is TouchAction.Touch -> {
+                            Log.d(TAG, "inner Touch")
+                            when (it.event.action) {
+                                MotionEvent.ACTION_DOWN -> {
+                                    Log.d(TAG, "inner MotionEvent.ACTION_DOWN")
+                                    startX = it.event.x.toInt()
+                                    startY = it.event.y.toInt()
+                                    Log.d(TAG,"ACTION_DOWN startX = $startX startY = $startY ")
+                                }
+                                MotionEvent.ACTION_MOVE -> {
+                                    val endX = it.event.x.toInt()
+                                    val endY = it.event.y.toInt()
+                                    val disX = abs(endX - startX)
+                                    val disY = abs(endY - startY)
+                                    if (disX < disY) {
+                                        binding.viewPager2.isUserInputEnabled = false
+                                        Log.d(TAG, "inner ACTION_MOVE binding.viewPager2.isUserInputEnabled = false")
+
+                                    }
+                                }
+                                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL-> {
+                                    Log.d(TAG, "inner MotionEvent.ACTION_UP or ACTION_CANCEL binding.viewPager2.isUserInputEnabled = true")
+                                    startX = 0
+                                    startY = 0
+                                    binding.viewPager2.isUserInputEnabled = true
+                                }
+
+                                else -> {}
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
+    private val exceptionHandler = CoroutineExceptionHandler { _, exception ->
+        Log.e(TAG, "CoroutineExceptionHandler exception : ${exception.message}")
+    }
+
 }

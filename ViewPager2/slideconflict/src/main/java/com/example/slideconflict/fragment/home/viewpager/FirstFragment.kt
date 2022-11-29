@@ -6,7 +6,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.slideconflict.R
+import com.example.slideconflict.adapter.StringAdapter
+import com.example.slideconflict.databinding.FragmentFirstBinding
+import com.example.slideconflict.viewmodel.TouchViewModel
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -25,6 +31,12 @@ class FirstFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+    private var _binding: FragmentFirstBinding? = null
+    private val binding get() = _binding!!
+
+    private val viewModel: TouchViewModel by activityViewModels()
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG,"inner onCreate")
@@ -40,7 +52,26 @@ class FirstFragment : Fragment() {
     ): View? {
         Log.d(TAG,"inner onCreateView")
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_first, container, false)
+        _binding = FragmentFirstBinding.inflate(inflater, container, false)
+
+        binding.recyclerview.addItemDecoration(
+            DividerItemDecoration(
+                binding.recyclerview.context,
+                (binding.recyclerview.layoutManager as LinearLayoutManager).orientation
+            )
+        )
+
+
+        val stringAdapter = StringAdapter((0..500).map { "string : $it" })
+        // 为RecyclerView配置adapter
+        binding.recyclerview.adapter = stringAdapter
+
+        binding.recyclerview.setTouchEventListener{
+            Log.d(TAG,"inner setTouchEventListener")
+            viewModel.touchRecyclerview(it)
+        }
+
+        return binding.root
     }
 
     companion object {

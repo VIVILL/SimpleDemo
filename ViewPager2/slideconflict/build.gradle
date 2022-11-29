@@ -43,8 +43,17 @@ dependencies {
 
     // viewpager2
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
+    // recyclerview
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    // SwipeRefreshLayout
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
     // navigation
     implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
     implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
+
+    //viewModelScope
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
+    // 使用 viewModels()
+    implementation 'androidx.fragment:fragment-ktx:1.5.4'
 }
