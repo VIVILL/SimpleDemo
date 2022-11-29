@@ -51,9 +51,17 @@ class HomeFragment : Fragment() {
             "ThirdFragment"
         )
 
+        // 使用requireActivity().supportFragmentManager时 旋转后会报错
+        // ViewPager2使用的问题 FragmentManager is already executing transactions
+        // http://bbs.xiangxueketang.cn/question/1977
+        /*
+        * 不要用getActivity().getSupportFragmentManager()的方式
+        * 而是getChildFragmentManager()管理
+        * */
         val adapter = ViewPagerAdapter(
             fragmentStringList,
-            requireActivity().supportFragmentManager,
+            /*requireActivity().supportFragmentManager*/
+            childFragmentManager,
             lifecycle
         )
 
