@@ -94,14 +94,17 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         Log.d(TAG,"inner onDestroyView")
         super.onDestroyView()
+        // https://stackoverflow.com/questions/61779776/leak-canary-detects-memory-leaks-for-tablayout-with-viewpager2
+        // TabLayout 解绑
+        mLayoutMediator?.detach()
+        mLayoutMediator = null
+        binding.viewPager2.adapter = null
         _binding = null
     }
 
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG,"inner onDestroy")
-        // TabLayout 解绑
-        mLayoutMediator?.detach()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
