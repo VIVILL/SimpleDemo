@@ -56,4 +56,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
     // 使用 viewModels()
     implementation 'androidx.fragment:fragment-ktx:1.5.4'
+
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
+
 }

@@ -70,6 +70,13 @@ class ThirdFragment : Fragment() {
         return binding.root
     }
 
+    override fun onDestroyView() {
+        Log.d(TAG,"inner onDestroyView")
+        super.onDestroyView()
+        binding.recyclerview.adapter = null
+        _binding = null
+    }
+
     companion object {
         /**
          * Use this factory method to create a new instance of

@@ -42,6 +42,8 @@ class ThirdFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_third, container, false)
     }
 
+
+
     companion object {
         /**
          * Use this factory method to create a new instance of
